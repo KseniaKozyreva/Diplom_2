@@ -1,6 +1,5 @@
-import requests
 import allure
-from urls import Urls
+from api_client import ApiClient
 
 class TestLoginUser:
 
@@ -8,7 +7,7 @@ class TestLoginUser:
     def test_login_existing_user_success(self, generate_user_data, user_teardown):
         payload = generate_user_data()
         
-        reg_response = requests.post(Urls.REGISTER_URL, json=payload)
+        reg_response = ApiClient.register_user(payload)
         token = reg_response.json().get("accessToken")
         
         if token:
@@ -18,7 +17,7 @@ class TestLoginUser:
             "email": payload["email"],
             "password": payload["password"]
         }
-        login_response = requests.post(Urls.LOGIN_URL, json=login_payload)
+        login_response = ApiClient.login_user(login_payload)
 
         assert login_response.status_code == 200
         assert login_response.json().get("success") is True
@@ -31,7 +30,7 @@ class TestLoginUser:
             "password": fake_payload["password"]
         }
         
-        response = requests.post(Urls.LOGIN_URL, json=login_payload)
+        response = ApiClient.login_user(login_payload)
         
         assert response.status_code == 401
         assert response.json().get("success") is False
@@ -41,7 +40,7 @@ class TestLoginUser:
     def test_login_incorrect_email_error(self, generate_user_data, user_teardown):
         payload = generate_user_data()
         
-        reg_response = requests.post(Urls.REGISTER_URL, json=payload)
+        reg_response = ApiClient.register_user(payload)
         token = reg_response.json().get("accessToken")
         
         if token:
@@ -51,7 +50,7 @@ class TestLoginUser:
             "email": "wrong_email_123@yandex.ru",
             "password": payload["password"]
         }
-        response = requests.post(Urls.LOGIN_URL, json=login_payload)
+        response = ApiClient.login_user(login_payload)
         
         assert response.status_code == 401
         assert response.json().get("success") is False
@@ -61,8 +60,8 @@ class TestLoginUser:
     def test_login_incorrect_password_error(self, generate_user_data, user_teardown):
         payload = generate_user_data()
         
-        reg_response = requests.post(Urls.REGISTER_URL, json=payload)
-        token = reg_resp = reg_response.json().get("accessToken")
+        reg_response = ApiClient.register_user(payload)
+        token = reg_response.json().get("accessToken")
         
         if token:
             user_teardown.append(token)
@@ -71,7 +70,7 @@ class TestLoginUser:
             "email": payload["email"],
             "password": "completely_wrong_password_abc"
         }
-        response = requests.post(Urls.LOGIN_URL, json=login_payload)
+        response = ApiClient.login_user(login_payload)
         
         assert response.status_code == 401
         assert response.json().get("success") is False

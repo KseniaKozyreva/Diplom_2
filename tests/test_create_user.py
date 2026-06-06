@@ -1,25 +1,31 @@
-import requests
 import allure
-from urls import Urls
+from api_client import ApiClient
 
 class TestCreateUser:
 
     @allure.title("Успешное создание уникального пользователя")
-    def test_create_unique_user_success(self, generate_user_data):
+    def test_create_unique_user_success(self, generate_user_data, user_teardown):
         payload = generate_user_data()
         
-        response = requests.post(Urls.REGISTER_URL, json=payload)
+        response = ApiClient.register_user(payload)
+        
+        token = response.json().get("accessToken")
+        if token:
+            user_teardown.append(token)
         
         assert response.status_code == 200
         assert response.json().get("success") is True
 
     @allure.title("Ошибка при создании пользователя, который уже зарегистрирован")
-    def test_create_duplicate_user_error(self, generate_user_data):
+    def test_create_duplicate_user_error(self, generate_user_data, user_teardown):
         payload = generate_user_data()
         
-        requests.post(Urls.REGISTER_URL, json=payload)
+        first_resp = ApiClient.register_user(payload)
+        token = first_resp.json().get("accessToken")
+        if token:
+            user_teardown.append(token) 
         
-        second_resp = requests.post(Urls.REGISTER_URL, json=payload)
+        second_resp = ApiClient.register_user(payload)
         
         assert second_resp.status_code == 403
         assert second_resp.json().get("success") is False
@@ -30,7 +36,7 @@ class TestCreateUser:
         payload = generate_user_data()
         payload["email"] = "" 
         
-        response = requests.post(Urls.REGISTER_URL, json=payload)
+        response = ApiClient.register_user(payload)
         
         assert response.status_code == 403
         assert response.json().get("success") is False
