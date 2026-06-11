@@ -1,11 +1,12 @@
 import pytest
 import allure
 from api_client import ApiClient
+from helpers import generate_user_data
 
 class TestOrders:
 
     @allure.title("Создание заказа авторизованным пользователем с ингредиентами")
-    def test_create_order_authorized_success(self, generate_user_data, user_teardown, get_ingredient_ids):
+    def test_create_order_authorized_success(self, user_teardown, get_ingredient_ids):
         user_payload = generate_user_data()
         reg_resp = ApiClient.register_user(user_payload)
         token = reg_resp.json().get("accessToken")
@@ -34,7 +35,7 @@ class TestOrders:
         assert response.json().get("success") is True
 
     @allure.title("Успешное получение заказов авторизованным пользователем")
-    def test_get_user_orders_authorized_success(self, generate_user_data, user_teardown):
+    def test_get_user_orders_authorized_success(self, user_teardown):
         user_payload = generate_user_data()
         reg_resp = ApiClient.register_user(user_payload)
         token = reg_resp.json().get("accessToken")
@@ -49,7 +50,7 @@ class TestOrders:
         assert response.json().get("success") is True
 
     @allure.title("Ошибка при создании заказа без ингредиентов")
-    def test_create_order_missing_ingredients_error(self, generate_user_data, user_teardown):
+    def test_create_order_missing_ingredients_error(self, user_teardown):
         user_payload = generate_user_data()
         reg_resp = ApiClient.register_user(user_payload)
         token = reg_resp.json().get("accessToken")
@@ -68,7 +69,7 @@ class TestOrders:
 
     @pytest.mark.xfail
     @allure.title("Ошибка при создании заказа с неверным хешем ингредиентов")
-    def test_create_order_invalid_ingredients_error(self, generate_user_data, user_teardown):
+    def test_create_order_invalid_ingredients_error(self, user_teardown):
         user_payload = generate_user_data()
         reg_resp = ApiClient.register_user(user_payload)
         token = reg_resp.json().get("accessToken")

@@ -1,5 +1,6 @@
 class Urls:
-    BASE_URL = "https://stellarburgers.education-services.ru/"
+    BASE_URL = "https://qa-stellarburgers.education-services.ru"
+
     REGISTER_URL = f"{BASE_URL}/api/auth/register"
     LOGIN_URL = f"{BASE_URL}/api/auth/login"
     LOGOUT_URL = f"{BASE_URL}/api/auth/logout"
@@ -8,4 +9,3 @@ class Urls:
     ORDERS_URL = f"{BASE_URL}/api/orders"
     ALL_ORDERS_URL = f"{BASE_URL}/api/orders/all"
     INGREDIENTS_URL = f"{BASE_URL}/api/ingredients"
-

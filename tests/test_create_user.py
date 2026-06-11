@@ -1,10 +1,11 @@
 import allure
 from api_client import ApiClient
+from helpers import generate_user_data
 
 class TestCreateUser:
 
     @allure.title("Успешное создание уникального пользователя")
-    def test_create_unique_user_success(self, generate_user_data, user_teardown):
+    def test_create_unique_user_success(self, user_teardown):
         payload = generate_user_data()
         
         response = ApiClient.register_user(payload)
@@ -17,7 +18,7 @@ class TestCreateUser:
         assert response.json().get("success") is True
 
     @allure.title("Ошибка при создании пользователя, который уже зарегистрирован")
-    def test_create_duplicate_user_error(self, generate_user_data, user_teardown):
+    def test_create_duplicate_user_error(self, user_teardown):
         payload = generate_user_data()
         
         first_resp = ApiClient.register_user(payload)
@@ -32,7 +33,7 @@ class TestCreateUser:
         assert second_resp.json().get("message") == "User already exists"
 
     @allure.title("Ошибка при создании пользователя без обязательного поля (email)")
-    def test_create_user_missing_field_error(self, generate_user_data):
+    def test_create_user_missing_field_error(self):
         payload = generate_user_data()
         payload["email"] = "" 
         

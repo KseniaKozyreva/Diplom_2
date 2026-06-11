@@ -1,20 +1,8 @@
 import pytest
 import requests
-import random
-import string
 from urls import Urls
-
-@pytest.fixture
-def generate_user_data():
-    def _generate():
-        letters = string.ascii_lowercase
-        random_string = ''.join(random.choice(letters) for _ in range(10))
-        return {
-            "email": f"{random_string}@yandex.ru",
-            "password": random_string,
-            "name": random_string
-        }
-    return _generate
+from helpers import generate_user_data
+from api_client import ApiClient
 
 @pytest.fixture
 def user_teardown():
@@ -28,3 +16,13 @@ def get_ingredient_ids():
     response = requests.get(Urls.INGREDIENTS_URL)
     ingredients_data = response.json().get("data", [])
     return [item.get("_id") for item in ingredients_data]
+
+@pytest.fixture
+def registered_user(user_teardown):
+    payload = generate_user_data()
+    reg_resp = ApiClient.register_user(payload) 
+    
+    token = reg_resp.json().get("accessToken")
+    if token:
+        user_teardown.append(token)
+    return payload

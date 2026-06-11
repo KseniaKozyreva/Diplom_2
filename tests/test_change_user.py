@@ -1,10 +1,11 @@
 import allure
 from api_client import ApiClient
+from helpers import generate_user_data
 
 class TestChangeUser:
 
     @allure.title("Успешное изменение данных авторизованного пользователя")
-    def test_change_user_authorized_success(self, generate_user_data, user_teardown):
+    def test_change_user_authorized_success(self, user_teardown):
         payload = generate_user_data()
         
         reg_resp = ApiClient.register_user(payload)
@@ -32,13 +33,8 @@ class TestChangeUser:
         assert response.json().get("message") == "You should be authorised"
 
     @allure.title("Ошибка при использовании почты другого пользователя")
-    def test_change_user_duplicate_email_error(self, generate_user_data, user_teardown):
-        # Регистрируем первого юзера
-        user1_payload = generate_user_data()
-        reg_resp1 = ApiClient.register_user(user1_payload)
-        token1 = reg_resp1.json().get("accessToken")
-        if token1:
-            user_teardown.append(token1)
+    def test_change_user_duplicate_email_error(self, user_teardown, registered_user):
+        other_user_email = registered_user["email"]
 
         user2_payload = generate_user_data()
         reg_resp2 = ApiClient.register_user(user2_payload)
@@ -46,7 +42,7 @@ class TestChangeUser:
         if token2:
             user_teardown.append(token2)
 
-        change_payload = {"email": user1_payload["email"]}
+        change_payload = {"email": other_user_email}
         
         client = ApiClient()
         response = client.change_user_data(change_payload, token=token2)
