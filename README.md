@@ -1,4 +1,4 @@
-# Автотесты API Stellar Burgers
+# Автоматизация тестирования REST API платформы Stellar Burgers
 
 Автоматизированные тесты для REST API космической бургерной на Python (`pytest` + `requests`).
 
